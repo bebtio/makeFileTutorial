@@ -1,0 +1,61 @@
+In the previous section we learned how to make a single executable from multiple
+sources that are each in different directories. We took our main.cpp file and our
+myFuncs.cpp file, turned them into object files, and them mashed those object files
+into our executable.
+
+Now we are going to add another cpp file called myMath.cpp.  In doing this,
+we are now dealing with multiple object files that must be combined with our main.o
+in order to form our executable.  This is just a small example so we only have two
+other object files: myMath.o and myFuncs.o.
+
+Imagine that you are working on a project that is a lot larger and has hundreds of
+cpp files that will produce hundreds of object files.  Each of those has to be linked
+with the main.o in order form an executable.  This isn't a big deal at all, you just
+add the object file names to the compilation command and the compiler will do the work
+you.
+
+Imagine though, that all of the hundreds of source files, you realize, would be very
+useful in another program you are working on and want to have a way to package these object
+files in a way that will make them easily compiled into that program, or any program.
+
+That's where static libraries come in.  Static libraries let you take all of the object
+files you want and combined them into a single file called myLib.a.  This has a lot of
+advantages. You can then take this single file and, instead of listing each object
+file in the compile command, you can list just myLib.a.  This makes managing the
+compilation process more simple and makes the code more usable across multiple projects.
+
+
+In this section we are going to have a new directory called myLibFiles which contain
+the files myMath.{cpp,hpp} and myPrint.{hpp,cpp}.
+myMath will contain two functions: add and diff.
+myPrint will contain one function: allCaps.
+The object files produces by these two files will be compiled into a static library
+using the ar ( archive ) command:
+  ar rvs myLib.a myMath.o myPrint.o
+
+Where myLib.a is the output and myMath.o and myPrint.o are the files to be combined
+into the static library ( aka archive ).
+The options rvs tells ar to to insert files into the archive (r), print a line for
+each file inserted (v), and to add and upate archive index (s).
+
+We could have also packaged the myFuncs.{hpp,cpp} files that were used in the previous
+section inside of the static library but I decided not to do that just to show the the
+difference between linking with a static library and a normal object file.
+
+From the top level of this directory you can call:
+  make staticLibs
+  or
+  make main
+
+staticLibs will create just the static library.
+main will create both the static libraries and the main executable.
+
+If you wanted to use the static library in a different project you could just
+create the staticLibs here and then compile your other program like this:
+
+make staticLibs && g++ path/to/your/main.cpp -I myLibFiles/ ./bin/myLib.a -o main.out
+
+Or you can try it here with the main function from this project and its sources.
+This is basically what "make main" will do.
+
+make staticLibs && g++ ./src/driver/main.cpp src/tools/myFuncs.cpp -I include -I myLibFiles/ ./bin/myLib.a -o main.out

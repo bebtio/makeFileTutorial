@@ -1,0 +1,67 @@
+
+There are four basic stages to compiling an executable:
+1.) Preprocessing
+2.) Compiling
+3.) Assembling
+4.) Linking
+
+1.) Preprocessing
+  In this stage, the preprocessor searches your source files and finds any #include preprocessor directives
+  and replaces them with the entire contents of the file the #include is referencing.
+  For example, when you type "#include <iostream>" in your main.cpp file, that "#include <iostream>"
+  gets replaced with the entire contents of iostream.hpp.
+  Example command:
+
+   g++ -E main.cpp -o main.i
+
+  -E flag tells g++ to stop at the preprocessor stage and create a file called main.i with
+  that output.
+
+
+2.) Compiling
+  In this stage, the compiler takes the output from the Preprocessing stage and creates an
+  assembly file with assembly level instructions.  Any functions that you reference from "#include" files
+  are unresolved at this point.  This means that your assembly files know those functions exist,but they don't have
+  an implementation for them yet; the implementation is dealt with during the linking stage (*1).
+
+  Example command:
+
+   g++ -S main.cpp -o main.s
+
+  -S flag tells g++ to create a file called main.s with the assembly level instructions.
+
+3.) Assembling
+  Next, the assembler takes the assembly files and creates binary object code.
+
+  Example command:
+
+   g++ -c main.cpp -o main.o
+
+  -c flag tells g++ to stop create an object file called main.o.
+
+4.) Linking
+  Finally, the linker takes all of your object files and combines them into an executable, resolving
+  any undefined references between object files and libraries.
+
+  Example command:
+
+    g++ main.cpp -o main
+
+You generate each of these files by using commands:
+
+  1.) This will create main.i
+  make preprocessor
+
+  2.) This will create main.s
+  make compiler
+
+  3.) This will create main.o
+  make linker
+
+  4.) This will make executable
+  make
+
+(*1) - If you want to see the symbols of your object files you could use the 'nm' or 'objdump' commands.
+       Functions you reference from an #include file will show up as undefined.
+       Using nm this appears as the letter "U".
+       Using objdump this appears as the string "UDEF".

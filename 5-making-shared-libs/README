@@ -1,0 +1,74 @@
+Previously we learned about static libraries, now we are going to learn
+about shared, or also dynamically link, libraries.  The main difference between
+the two types of libraries is that static libraries contain all of your object
+file code inside the executable while a dynamic library does not.
+
+The reason this is that a static library is just a collection of objects files.
+When your executable is compiled with a static library, its as if you compiled
+all you object files directly into it.  In fact,This means that your executable has all
+the same data that was in each object file; so an executable compiled
+with a static library is just a summation of all objects needed to create it. An
+important result of this is that changing the code inside of the library will force
+you to recompile your entire program.
+
+On the other hand, a shared library will live outside the code of your executable;
+instead of being compiled directly into your program, your executable will load the
+functions it needs at load time or run time.  So your executable basically has a
+pointer to the library location and references the library contents when it needs
+them. This means that you can make edits to the library and not need to recompile
+your entire program, just the library!
+
+Some new flags we will have to learn are:
+  -fpic
+  -shared
+  -Wl
+  -rpath
+  -L
+  -l
+
+
+fpic is used when we are creating the object files that will be added to the shared library.
+  It lets the compiler generate Position Independent Code, which makes sharing the code in a shared
+  library easier for the computer.
+
+shared tells the compiler to build the output of the command as a shared library.
+
+Wl lets you pass additional arguments, as comma separated list, to the linker. Used in
+  conjuction with rpath.
+
+rpath tells your program where to look for your shared library at run time.
+
+L tells the compiler where to find the shared library at compile time.
+
+l ( lower case L ) tells the compiler the name of the library you want to use.
+
+Steps for making a shared libary
+1.) For each object file that will be in your library, compile it using the -fpic flag:
+ g++ -fpic -c file1.cpp -I includes -o file1.o
+ g++ -fpic -c file2.cpp -I includes -o file2.o
+
+2.) Create your shared library using your object files:
+  g++ -shared file1.o file2.o -o libSharedLib.so
+  NOTE: Apparently, convention mandates that shared libraries need to have lib in
+  front of their names, or else the compiler wont be able to find them later.
+
+3.) Compile your main with the shared library.
+  g++ main.cpp -Iincludes/ -Wl,-rpath=./path/to/libDir/ -L./path/to/libDir/ -lmyLib -o bin/main
+
+Common Errors:
+------------------------------------
+./main: error while loading shared libraries: libmyLib.so: cannot open shared object file: No such file or directory
+
+Usually occurs after a successful compilation and then running.
+Either:
+(1) the library is no longer where you said it should be in your -rpath command or
+(2) you typed the path in -rpath incorrectly.
+
+------------------------------------
+/usr/bin/ld: cannot find rpath=/bin/: No such file or directory
+collect2: error: ld returned 1 exit status
+
+Usually occurs at compilation.
+Either:
+(1) the library is no longer where you said it should be in your -L command or
+(2) you typed the path in -L incorrectly.
